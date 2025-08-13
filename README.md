@@ -26,7 +26,6 @@ pip install putergenai
 For development, clone the repo and install locally:
 
 ```bash
-git clone https://github.com/nerve11/putergenai.git
 git clone https://github.com/kernferm/putergenai.git
 cd putergenai
 pip install -e .
