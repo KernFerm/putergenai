@@ -8,11 +8,8 @@ We actively provide security fixes for the versions below. Older versions should
 
 | Version        | Supported |
 |----------------|-----------|
-| 0.1.6          | ✅        |
-| 0.1.3          | ❌        |
-| 0.1.1          | ❌        |
-| 0.1.x (latest) | ❌        |
-| < 0.1.1        | ❌        |
+| 0.1.6          | ❌        |
+| 1.6.1          | ✅        |
 
 > Note: Previously listed `1.6` referred to `0.1.6`. This has been corrected.
 
