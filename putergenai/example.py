@@ -129,7 +129,7 @@ class PuterApp(ctk.CTk):
                         line = key + "=" + encrypted_value + "\n"
                         encrypted_lines.append(line)
                     except Exception as encrypt_error:
-                        print(f"Error encrypting key for {key}: {encrypt_error}")
+                        print(f"Error encrypting key for service: {encrypt_error}")
                         continue
             
             # Write all encrypted lines at once
@@ -178,7 +178,7 @@ class PuterApp(ctk.CTk):
                         api_key = ""
                     self.api_key_entry.insert(0, str(api_key))
                 except Exception as e:
-                    print(f"Error setting API key: {e}")
+                    print("Error setting API key entry field")
                     # If there's an error, just clear the field
                     try:
                         self.api_key_entry.delete(0, tk.END)
@@ -337,10 +337,11 @@ class PuterApp(ctk.CTk):
                 import requests
                 resp = requests.post(url, headers=headers, json=data, timeout=60)  # Increased timeout
                 
-                # Debug: Log response details
+                # Debug: Log response details (without sensitive data)
                 print(f"Model {model_name}: Status {resp.status_code}")
                 if resp.status_code != 200:
-                    print(f"Response: {resp.text[:200]}")
+                    # Don't log the actual response as it may contain sensitive error details
+                    print(f"Request failed with status {resp.status_code}")
                 
                 if resp.status_code == 200:
                     # Check if response is actually an image
@@ -364,11 +365,11 @@ class PuterApp(ctk.CTk):
                                 last_error = f"Model loading: {wait_time}s"
                                 continue
                             elif 'error' in error_data:
-                                last_error = error_data['error']
-                                print(f"API Error: {last_error}")
+                                last_error = "API returned an error"
+                                print("API Error occurred (details not logged for security)")
                                 continue
                         except:
-                            last_error = f"Invalid response format: {resp.text[:100]}"
+                            last_error = "Invalid response format from API"
                             continue
                 elif resp.status_code == 401:
                     last_error = "Invalid API token - check your Hugging Face token"
@@ -383,7 +384,7 @@ class PuterApp(ctk.CTk):
                     last_error = f"Model {model_name} unavailable (service overloaded)"
                     continue
                 else:
-                    last_error = f"HTTP {resp.status_code}: {resp.text[:100]}"
+                    last_error = f"HTTP {resp.status_code} error from API"
                     continue
                     
             except requests.exceptions.Timeout:
@@ -426,7 +427,7 @@ class PuterApp(ctk.CTk):
             self.after(0, lambda: self.chat_box.insert("end", f"[Replicate] Prompt: {prompt}\nResult URL: {output}\n\n"))
             self.after(0, lambda: self.status_label.configure(text="Replicate request submitted.", text_color="green"))
         else:
-            self.after(0, lambda: self.chat_box.insert("end", f"[Replicate] Error: {resp.text}\n\n"))
+            self.after(0, lambda: self.chat_box.insert("end", f"[Replicate] Error: API request failed\n\n"))
             self.after(0, lambda: self.status_label.configure(text="Replicate API error.", text_color="red"))
 
     def _generate_deepai_image(self, prompt):
@@ -445,7 +446,7 @@ class PuterApp(ctk.CTk):
             self.after(0, lambda: self.chat_box.insert("end", f"[DeepAI] Prompt: {prompt}\nImage URL: {output}\n\n"))
             self.after(0, lambda: self.status_label.configure(text="DeepAI image generated.", text_color="green"))
         else:
-            self.after(0, lambda: self.chat_box.insert("end", f"[DeepAI] Error: {resp.text}\n\n"))
+            self.after(0, lambda: self.chat_box.insert("end", f"[DeepAI] Error: API request failed\n\n"))
             self.after(0, lambda: self.status_label.configure(text="DeepAI API error.", text_color="red"))
 
     def _generate_openai_image(self, prompt):
@@ -465,7 +466,7 @@ class PuterApp(ctk.CTk):
             self.after(0, lambda: self.chat_box.insert("end", f"[OpenAI] Prompt: {prompt}\nImage URL: {output}\n\n"))
             self.after(0, lambda: self.status_label.configure(text="OpenAI image generated.", text_color="green"))
         else:
-            self.after(0, lambda: self.chat_box.insert("end", f"[OpenAI] Error: {resp.text}\n\n"))
+            self.after(0, lambda: self.chat_box.insert("end", f"[OpenAI] Error: API request failed\n\n"))
             self.after(0, lambda: self.status_label.configure(text="OpenAI API error.", text_color="red"))
 
     def _image_generation_error(self, error_msg):
@@ -775,17 +776,31 @@ class PuterApp(ctk.CTk):
 # --- Flask Secure Cookie Example ---
 from flask import Flask, make_response, request
 from cryptography.fernet import Fernet
+import secrets
 
 app = Flask("Secure Example")
+# Use a secure key from environment or generate securely
+app.secret_key = secrets.token_hex(32)
 fernet = Fernet(Fernet.generate_key())
 
 @app.route('/')
 def index():
     password = request.args.get("password")
     if password:
-        encrypted = fernet.encrypt(password.encode()).decode()
-        resp = make_response("Password received (encrypted in cookie)")
-        resp.set_cookie("password", encrypted, secure=True, httponly=True)
+        # Don't store passwords in cookies at all - this is just for demonstration
+        # In production, use session tokens or other secure methods
+        session_token = secrets.token_urlsafe(32)
+        
+        # Store the password securely server-side (not shown here)
+        # encrypted_password = fernet.encrypt(password.encode()).decode()
+        
+        resp = make_response("Authentication token created (password not stored in cookie)")
+        # Store only a session token, not the actual password
+        resp.set_cookie("session_token", session_token, 
+                       secure=True, 
+                       httponly=True, 
+                       samesite='Strict',
+                       max_age=3600)  # 1 hour expiration
         return resp
     return "No password provided"
 
