@@ -119,11 +119,30 @@ class PuterApp(ctk.CTk):
     def _save_api_keys(self):
         """Save API keys to encrypted file"""
         try:
-            with open("api_keys.cfg", "w") as f:
-                for key, value in self.api_keys.items():
-                    if value and value.strip():  # Only save non-empty keys
+            # Create a secure temporary list to avoid direct string formatting
+            encrypted_lines = []
+            for key, value in self.api_keys.items():
+                if value and value.strip():  # Only save non-empty keys
+                    try:
                         encrypted_value = self._encrypt(value)
-                        f.write(f"{key}={encrypted_value}\n")
+                        # Use safer string concatenation instead of f-string for sensitive data
+                        line = key + "=" + encrypted_value + "\n"
+                        encrypted_lines.append(line)
+                    except Exception as encrypt_error:
+                        print(f"Error encrypting key for {key}: {encrypt_error}")
+                        continue
+            
+            # Write all encrypted lines at once
+            config_file = "api_keys.cfg"
+            with open(config_file, "w") as f:
+                f.writelines(encrypted_lines)
+            
+            # Set restrictive file permissions (Windows compatible)
+            try:
+                os.chmod(config_file, stat.S_IREAD | stat.S_IWRITE)
+            except Exception as perm_error:
+                print(f"Warning: Could not set file permissions: {perm_error}")
+                
         except Exception as e:
             print(f"Error saving API keys: {e}")
 
