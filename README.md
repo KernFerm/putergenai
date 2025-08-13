@@ -268,7 +268,7 @@ This repository includes a CustomTkinter-based GUI for PutergenAI, allowing you 
 9. **Sign Out:** Click the Sign Out button to securely log out and return to the login screen.
 
 ## Requirements
-- Python 3.8+
+- Python 3.11
 - `putergenai` (see SDK instructions above)
 - `customtkinter`, `Pillow`, `requests`, `cryptography`
 
