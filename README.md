@@ -27,6 +27,8 @@ For development, clone the repo and install locally:
 
 ```bash
 git clone https://github.com/kernferm/putergenai.git
+or
+git clone https://github.com/nerve11/putergenai.git
 cd putergenai
 pip install -e .
 ```
