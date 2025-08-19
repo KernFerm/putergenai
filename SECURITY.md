@@ -17,7 +17,7 @@ We actively provide security fixes for the versions below. Older versions should
 
 If you believe you’ve found a security issue, please email:
 
-- **contact@fnbubbles420.org** (preferred)
+- **securitygithubissue@fnbubbles420.org** (preferred)
 - Alternatively, open a **GitHub private security advisory** on the repository.
 
 Please include:
