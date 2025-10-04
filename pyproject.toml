@@ -27,8 +27,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/pysnippet/puter-genai"
-"Bug Tracker" = "https://github.com/pysnippet/puter-genai/issues"
+"Homepage" = "https://github.com/KernFerm/putergenai"
+"Bug Tracker" = "https://github.com/KernFerm/putergenai/issues"
 
 [tool.setuptools]
 packages = ["putergenai"]
